@@ -43,7 +43,7 @@ while a==True:
 5. Consultar Info vigente del cliente
 6.  ''')
 
-    #s garantiza que el usuario ingrese un numero entero para la eleccion de la opcion
+    #se garantiza que el usuario ingrese un numero entero para la eleccion de la opcion
     try:
         opcion= int(input('ingrese el numero de la opcion deseada'))
     

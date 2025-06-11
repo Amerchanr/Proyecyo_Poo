@@ -84,4 +84,11 @@ def main():
     cerrarDB(micon)
 
         
-main()
+def borrar_tabla(con):
+    cursorObj=con.cursor()
+    cad="DROP TABLE IF EXISTS CLIENTES"
+    cursorObj.execute(cad)
+    print("Tabla borrada exitosamente")
+micon=conexionBD()
+
+borrar_tabla(micon)
