@@ -84,7 +84,7 @@ def leerProducto():
         except ValueError:
             print('El valor de la remuneracion del producto debe ser un numerico ')
     producto=(NoIdProducto,NombreProducto,TipoProducto,Remuneracion)
-    print("la tupla es:",producto)
+    print("la datos ingresados es:",producto)
     return producto
 
 def consultaProducto(con):
