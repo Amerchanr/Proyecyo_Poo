@@ -1,3 +1,5 @@
+#Tablas---------------------------------------------------------------------------------------------------------------------------------- 
+# Creacion de tablas para los 4 modulos 
 def crearTablas(con):
     cursor = con.cursor()
     # Tabla de productos

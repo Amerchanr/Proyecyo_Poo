@@ -28,7 +28,12 @@ def concafecha():
     fechacon=(dia+'/'+mes+'/'+año)
     print(fechacon)
     return fechacon
-        
+
+
+#Productos existente ------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+# Funcion de consulta d eproducto 
 def consultarProductosExistentes(con):
     
     idCuentaCredito=str(leer_entero('ingrese el numero de cuenta del producto adquirido'))
@@ -54,7 +59,7 @@ def consultarProductosExistentes(con):
         plazopend=row[8]
         print("idCuentaCredito: ",idcuenta,"\nidProducto: ",idprodu,"\nidCliente: ",idcliente,"\ncapitalInicial : ",capinit,"\nplazoMeses : ",plazoM,"\nfechaEntrega : ",fechaEnt,"\nsaldoCapital : ",saldocap,"\nsumatoriaInteresesPagados : ",sumintpag,"\nplazoPendiente : ",plazopend)
 
-
+# Funcion de consulta para que el producto sea verificado si esta o no esta 
 
 def leerProductoContratado(con):
     cursor = con.cursor()
@@ -120,7 +125,7 @@ def leerProductoContratado(con):
     print(f" Su número de cuenta u obligación es: {idCuenta}")
 
 
-
+#Menu del producto adquirido
 def MenuAdquirirProducto(con):
     salirProductosContratados = False
     while not salirProductosContratados:
@@ -146,6 +151,8 @@ def MenuAdquirirProducto(con):
         else:
             print("Opción no válida.")
 
+
+# Se proporciona las definiciones de los catos de cliente
 def leerCliente1():
     noIdCliente = leer_entero("ID cliente (número): ")
     nombre = leer_texto("Nombre: ")
@@ -165,6 +172,7 @@ def insertarCliente1(con, cliente):
     except sqlite3.IntegrityError:
         print("Ya existe un cliente con ese ID.")
 
+#Menu productos  
 
 def menuProductosContratados(con):
     salirProductosContratados = False
@@ -209,10 +217,4 @@ def concafecha():
     return fechacon
 
             
-#micon=conexionBD()
-#menuProductosContratados(micon)
-#concafecha()
-#BorrarProducto(micon)
-#leerProductoContratado(micon)
-#MenuCrearProducto(micon)
-#consultarProductosExistentes(micon)
+

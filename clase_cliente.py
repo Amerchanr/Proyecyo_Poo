@@ -20,6 +20,9 @@ def cerrarDB(con):
     con.close()
     print('conexion cerrada')
 
+## Cliente -----------------------------------------------------------------------------------------------------------------------------------
+
+## Creacion de un formato que te pregunta la fecha
 def concafecha():
     dia=input('ingrese el dia en formato DD')
     mes=input('ingrese el mes en formato MM')
@@ -28,7 +31,7 @@ def concafecha():
     print(fechacon)
     return fechacon
 
-
+# Toma el producto cliente y la funcion leerProductoContratado1 para verificar id
 
 def leerProductoContratado1(con):
     cursor = con.cursor()
@@ -95,9 +98,7 @@ def leerProductoContratado1(con):
 
 
 
-
-
-
+#inserta  lso espacion referente a cada clienmte en este caso son 6 espacios que se definen en las tablas
 def insertarCliente(con, cliente):
     cursor = con.cursor()
     try:
@@ -110,7 +111,7 @@ def insertarCliente(con, cliente):
     except sqlite3.IntegrityError:
         print("Ya existe un cliente con ese ID.")
 
-
+#Se dan definiciones sobre los datos del clientes 
 def leerCliente():
     noIdCliente = leer_entero("ID cliente (número): ")
     nombre = leer_texto("Nombre: ")
@@ -120,7 +121,7 @@ def leerCliente():
     correo = leer_correo("Correo: ")
     return noIdCliente, nombre, apellido, direccion, str(telefono), correo
 
-
+# En caso de que el cliente quiera actualziar datos 
 def actualizarDireccion(con):
     idCliente = input("ID del cliente: ")
     nuevdirec = leer_no_vacio('Ingrese la nueva dirección: ')
@@ -132,7 +133,7 @@ def actualizarDireccion(con):
     # Aseguramos la persistencia con un commit
     con.commit()
     
-
+#En funcion a la idea de que el cliente decida saber su informacion 
 def consultarInformacionCliente(con):
     idCliente = input("ID del cliente a consultar: ")
     cursor = con.cursor()
@@ -176,17 +177,10 @@ def menuClinetes(con):
         else:
             print("Elija opcion válida.")
 
-
+#No imolementado, pero es eleminiar dato y tabla
 def borrar_tabla(con):
     cursorObj=con.cursor()
     cad="DROP TABLE IF EXISTS CLIENTES"
     cursorObj.execute(cad)
     print("Tabla borrada exitosamente")
     
-#micon=conexionBD()    
-#cerrarDB(micon)    
-#actualizarDireccion(micon)
-#crearTablaClientes(micon)
-#cliente1=leerCliente()
-#insertarCliente(micon,cliente1)
-#borrar_tabla(micon)
