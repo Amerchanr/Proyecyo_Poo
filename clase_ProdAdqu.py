@@ -59,23 +59,28 @@ def concafecha():
         
 def consultarProductosExistentes(con):
     
-    NoIdProducto=leer_entero('ingrese el iD del producto adquirido')
+    idCuentaCredito=str(leer_entero('ingrese el numero de cuenta del producto adquirido'))
     
     #creamos el objeto para recorrer la base de datos
     cursorObj=con.cursor()
     #CREAMOS LA CADENA CON EL SQL QUE QUEREMOS EJECUTAR
-    cad='''SELECT idCuentaCredito,idProducto,idCliente,capitalInicial,plazoMeses,fechaEntrega,saldoCapital,sumatoriaInteresesPagados,plazoPendiente FROM PRODUCTOS WHERE idProducto='''+NoIdProducto
+    cad="SELECT idCuentaCredito,idProducto,idCliente,capitalInicial,plazoMeses,fechaEntrega,saldoCapital,sumatoriaInteresesPagados,plazoPendiente FROM ProductosContratados WHERE idCuentaCredito="+idCuentaCredito
     #ejecutamos la cadena con el metodo execute del objeto cursorObj
     cursorObj.execute(cad)
     filas=cursorObj.fetchall()
     if filas==[]:
         print('el Id del producto consultado no existe')
     for row in filas:
-        id1=row[0]
-        tipo=row[2]
-        nombre=row[1]
-        remuneracion=row[3]
-        print("NoIdProducto: ",id1,"\nNombreProducto: ",nombre,"\nTipoProducto: ",tipo,"\nRemuneracion: ",remuneracion)
+        idcuenta=row[0]
+        idprodu=row[1]
+        idcliente=row[2]
+        capinit=row[3]
+        plazoM=row[4]
+        fechaEnt=row[5]
+        saldocap=row[6]
+        sumintpag=row[7]
+        plazopend=row[8]
+        print("idCuentaCredito: ",idcuenta,"\nidProducto: ",idprodu,"\nidCliente: ",idcliente,"\ncapitalInicial : ",capinit,"\nplazoMeses : ",plazoM,"\nfechaEntrega : ",fechaEnt,"\nsaldoCapital : ",saldocap,"\nsumatoriaInteresesPagados : ",sumintpag,"\nplazoPendiente : ",plazopend)
 
 
 
@@ -214,3 +219,4 @@ def BorrarProducto(con):
 #BorrarProducto(micon)
 #leerProductoContratado(micon)
 #MenuCrearProducto(micon)
+#consultarProductosExistentes(micon)
