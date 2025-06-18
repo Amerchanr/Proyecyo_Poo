@@ -4,9 +4,6 @@ import sqlite3
 from sqlite3 import Error
 import clase_productos
 from clase_productos import menuProductos
-#from clase_productos import insertarNuevoProducto1
-#from clase_productos import leerProducto
-#from clase_productos import consultaProducto
 import clase_cliente
 from clase_cliente import insertarCliente
 from clase_cliente import leerCliente

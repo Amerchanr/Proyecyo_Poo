@@ -19,7 +19,21 @@ def cerrarDB(con):
     con.close()
 
 
-
+def consultaProducto(con):
+    NoIdProducto=input("Codigo del producto que desea consultar:")
+    #creamos el objeto para recorrer la base de datos
+    cursorObj=con.cursor()
+    #CREAMOS LA CADENA CON EL SQL QUE QUEREMOS EJECUTAR
+    cad="SELECT NoIdProducto,NombreProducto,TipoProducto,Remuneracion FROM PRODUCTOS WHERE NoIdProducto="+NoIdProducto
+    #ejecutamos la cadena con el metodo execute del objeto cursorObj
+    cursorObj.execute(cad)
+    filas=cursorObj.fetchall()
+    for row in filas:
+        id1=row[0]
+        tipo=row[2]
+        nombre=row[1]
+        remuneracion=row[3]
+        print("NoIdProducto: ",id1,"\nNombreProducto: ",nombre,"\nTipoProducto: ",tipo,"\nRemuneracion: ",remuneracion)
 
     
 def crearTablaProductos1(con):
