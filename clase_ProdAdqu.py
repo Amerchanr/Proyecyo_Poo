@@ -8,6 +8,8 @@ from lectura_datos import leer_correo
 import clase_cliente
 from clase_cliente import insertarCliente1
 from clase_cliente import leerCliente
+import clase_productos
+from clase_productos import consultarProducto1
 
 
 #creacion y conexion con la bas ede datos
@@ -47,16 +49,22 @@ def crearTablaProducAdq(con):
     con.commit()
 
 
-
+def concafecha():
+    dia=input('ingrese el dia en formato DD')
+    mes=input('ingrese el mes en formato MM')
+    año=input('ingrese el año en formato AAAA')
+    fechacon=(dia+'/'+mes+'/'+año)
+    print(fechacon)
+    return fechacon
         
 def consultarProductosExistentes(con):
+    
     NoIdProducto=leer_entero('ingrese el iD del producto adquirido')
     
     #creamos el objeto para recorrer la base de datos
     cursorObj=con.cursor()
     #CREAMOS LA CADENA CON EL SQL QUE QUEREMOS EJECUTAR
-    cad='''SELECT idCuentaCredito,idProducto,idCliente,capitalInicial,plazoMeses,fechaEntrega,saldoCapital,sumatoriaInteresesPagados,
-                plazoPendiente FROM PRODUCTOS WHERE idProducto='''+NoIdProducto
+    cad='''SELECT idCuentaCredito,idProducto,idCliente,capitalInicial,plazoMeses,fechaEntrega,saldoCapital,sumatoriaInteresesPagados,plazoPendiente FROM PRODUCTOS WHERE idProducto='''+NoIdProducto
     #ejecutamos la cadena con el metodo execute del objeto cursorObj
     cursorObj.execute(cad)
     filas=cursorObj.fetchall()
@@ -73,8 +81,10 @@ def consultarProductosExistentes(con):
 
 def leerProductoContratado(con):
     cursor = con.cursor()
-
+    print('Las opciones de productos que podemos ofrecer son')
+    consultarProducto1(con)
     # Leer ID del producto
+    
     idProducto = leer_entero("Número de producto a contratar: ")
     
     cursor.execute("SELECT tipoProducto, remuneracion FROM Productos WHERE noIdProducto=?", (idProducto,))
@@ -101,13 +111,19 @@ def leerProductoContratado(con):
         if tipo == 1:
             capital = float(input("Capital inicial: "))
             plazo = int(input("Plazo en meses: "))
-            fecha = input("Fecha de apertura (DD/MM/AAAA): ")
+            fecha = concafecha()
             saldo = capital
             plazoPendiente = plazo
         else:
-            capital = float(input("Monto inicial de ahorro: "))
+            capital=int(0)
+            while capital<100000:
+                
+                print('el monto minimo inicial de ahorro es de 100000')
+                capital = float(input("Monto inicial de ahorro: "))
+            
             plazo = 0
-            fecha = input("Fecha de apertura (DD/MM/AAAA): ")
+            
+            fecha = concafecha()
             saldo = capital
             plazoPendiente = 0
     except ValueError:
@@ -126,15 +142,7 @@ def leerProductoContratado(con):
     print(" Producto contratado registrado correctamente.")
     print(f" Su número de cuenta u obligación es: {idCuenta}")
 
-    
-def insertarProductoContratado(con, datos):
-    if datos:
-        cursor = con.cursor()
-        cursor.execute('''INSERT INTO ProductosContratados
-            (idProducto, idCliente, capitalInicial, plazoMeses, fechaEntrega, saldoCapital, sumatoriaInteresesPagados, plazoPendiente)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)''', datos)
-        con.commit()
-        print("Producto contratado registrado correctamente.")
+
 
 def MenuCrearProducto(con):
     salirProductosContratados = False
@@ -151,13 +159,11 @@ def MenuCrearProducto(con):
 
                             ''')
         if(opPrincipal == '1'):
-            datos = leerProductoContratado(con)
-            insertarProductoContratado(con, datos)
+            leerProductoContratado(con)
         elif (opPrincipal == '2'):
             cliente=leerCliente()
             insertarCliente1(con,cliente)
-            datos = leerProductoContratado(con)
-            insertarProductoContratado(con, datos)
+            leerProductoContratado(con)
         elif (opPrincipal == '3'):
             salirProductosContratados = True
         else:
@@ -189,9 +195,22 @@ def menuProductosContratados(con):
             salirProductosContratados = True
         else:
             print("Opción no válida.")
+def BorrarProducto(con):
+    NoIdProducto=input("Codigo del producto:")
+    #creamos el objeto para recorrer la base de datos
+    cursorObj=con.cursor()
+    #CREAMOS LA CADENA CON EL SQL QUE QUEREMOS EJECUTAR
+    cad="DELETE FROM ProductosContratados  WHERE idCuentaCredito="+NoIdProducto
+    #ejecutamos la cadena con el metodo execute del objeto cursorObj
+    cursorObj.execute(cad)
+    #aseguramos la persistencia con un commit
+    con.commit()
 
 
             
 #micon=conexionBD()
 #menuProductosContratados(micon)
-            
+#concafecha()
+#BorrarProducto(micon)
+#leerProductoContratado(micon)
+#MenuCrearProducto(micon)

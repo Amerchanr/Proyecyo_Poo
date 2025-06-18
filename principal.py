@@ -75,7 +75,6 @@ while Salirprincipal==True:
 
        
     if (opcionPrincipal=='3'):
-        #print('hola')
         menuProductosContratados(micon)
         
     if (opcionPrincipal=='4'):
