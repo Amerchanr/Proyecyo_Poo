@@ -1,8 +1,8 @@
 import sqlite3
 from sqlite3 import Error
 from lectura_datos import *
-from clase_cliente import *
 from clase_productos import *
+
 
 
 #creacion y conexion con la bas ede datos
@@ -138,7 +138,7 @@ def MenuAdquirirProducto(con):
         if(opPrincipal == '1'):
             leerProductoContratado(con)
         elif (opPrincipal == '2'):
-            cliente=leerCliente()
+            cliente=leerCliente1()
             insertarCliente1(con,cliente)
             leerProductoContratado(con)
         elif (opPrincipal == '3'):
@@ -146,7 +146,24 @@ def MenuAdquirirProducto(con):
         else:
             print("Opción no válida.")
 
-
+def leerCliente1():
+    noIdCliente = leer_entero("ID cliente (número): ")
+    nombre = leer_texto("Nombre: ")
+    apellido = leer_texto("Apellido: ")
+    direccion = leer_no_vacio("Dirección: ")
+    telefono = leer_entero("Teléfono (número): ")
+    correo = leer_correo("Correo: ")
+    return noIdCliente, nombre, apellido, direccion, str(telefono), correo
+def insertarCliente1(con, cliente):
+    cursor = con.cursor()
+    try:
+        cursor.execute("INSERT INTO Clientes VALUES (?, ?, ?, ?, ?, ?)", cliente)
+        con.commit()
+        print("Cliente creado correctamente.")
+    #esta ecepcion me permite que si hay un cliente que escriba un id ya existente , no lo permita
+    #y el programa no seje de funcionar, en cambio le anuncie al cliente que  el id ya existe
+    except sqlite3.IntegrityError:
+        print("Ya existe un cliente con ese ID.")
 
 
 def menuProductosContratados(con):

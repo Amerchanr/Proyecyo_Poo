@@ -96,16 +96,7 @@ def leerProductoContratado1(con):
 
 
 
-def insertarCliente1(con, cliente):
-    cursor = con.cursor()
-    try:
-        cursor.execute("INSERT INTO Clientes VALUES (?, ?, ?, ?, ?, ?)", cliente)
-        con.commit()
-        print("Cliente creado correctamente.")
-    #esta ecepcion me permite que si hay un cliente que escriba un id ya existente , no lo permita
-    #y el programa no seje de funcionar, en cambio le anuncie al cliente que  el id ya existe
-    except sqlite3.IntegrityError:
-        print("Ya existe un cliente con ese ID.")
+
 
 def insertarCliente(con, cliente):
     cursor = con.cursor()
