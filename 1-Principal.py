@@ -10,7 +10,6 @@ from tablas import *
 
 
 
-
 #se crea variable global para ejecutar y poder salir del bucle del menu  principal y menus adicionales  
 Salirprincipal=True
 salirProductos=True

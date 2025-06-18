@@ -19,6 +19,8 @@ def cerrarDB(con):
     con.close()
 
 
+#Producto -------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 def consultaProducto(con):
     NoIdProducto=input("Codigo del producto que desea consultar:")
     #creamos el objeto para recorrer la base de datos
@@ -80,7 +82,7 @@ def leerProducto():
             
     NombreProducto=str(input("Ingrese el nombre del producto"))
 
-    TipoProducto=int(input("tipo producto 1 para credito 2 para Cuenta de Ahorro"))
+    TipoProducto=int(input("tipo producto 1 para credito 2 para Cuenta de Ahorro : "))
     
     if TipoProducto==1:
         print('ha elegido credito')
@@ -88,7 +90,7 @@ def leerProducto():
         print('ha elegido cuenta de ahorro')
     while TipoProducto not in [1,2]:
         print('seleccione 1 o 2 dependiendo el tipo de producto')
-        TipoProducto=int(input("tipo producto 1 para credito 2 para Cuenta de Ahorro"))
+        TipoProducto=int(input("tipo producto 1 para credito 2 para Cuenta de Ahorro : "))
         if TipoProducto==1:
             print('ha elegido credito')
         elif TipoProducto==2:
@@ -96,13 +98,14 @@ def leerProducto():
 
     while True:
         try:
-            Remuneracion=float(input("Ingrese la tasa de interes en formato numerico"))
+            Remuneracion=float(input("Ingrese la tasa de interes en formato numerico : "))
             break
         except ValueError:
             print('El valor de la remuneracion del producto debe ser un numerico ')
     producto=(NoIdProducto,NombreProducto,TipoProducto,Remuneracion)
     print("la datos ingresados es:",producto)
     return producto
+
 def borrar_tabla(con):
     cursorObj=con.cursor()
     cad="DROP TABLE IF EXISTS PRODUCTOS"
@@ -120,12 +123,12 @@ def menuProductos(con):
         opcionProductos=(input('''
                                         Menu Productos
                                         1. Crear Nuevo Producto
-                                        2. Consuultar Producto
+                                        2. Consultar Producto
                                         3. Volver al menu Principal
                                         Seleccione una opcion >>>>:  '''))
             
         if (opcionProductos=='1'):
-            miNuevoProducto=leerProducto()
+            miNuevoProducto = leerProducto()
             insertarNuevoProducto1(con,miNuevoProducto)
         elif(opcionProductos=='2'):
             consultaProducto(con)
@@ -135,9 +138,4 @@ def menuProductos(con):
             print('Ingrese una opcion valida')            
     
 
-#micon=conexionBD()
-#consultarProducto1(micon)
-#menuProductos(micon)
-#borrar_tabla(micon)
-#cerrarDB(micon)
-#crearTablaProductos1(micon)
+

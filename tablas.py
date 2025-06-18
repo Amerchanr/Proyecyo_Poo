@@ -1,7 +1,7 @@
 def crearTablas(con):
     cursor = con.cursor()
     # Tabla de productos
-    cursor.execute('''CREATE TABLE IF NOT EXISTS PRODUCTOS (NoIdProducto integer ,
+    cursor.execute('''CREATE TABLE IF NOT EXISTS PRODUCTOS (NoIdProducto INTEGER PRIMARY KEY ,
                                         NombreProducto txt NOT NULL,
                                         TipoProducto integer NOT NULL,
                                         Remuneracion integer NOT NULL,
