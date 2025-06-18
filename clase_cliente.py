@@ -1,12 +1,8 @@
 import sqlite3
 from sqlite3 import Error
-import lectura_datos
-from lectura_datos import leer_entero
-from lectura_datos import leer_texto
-from lectura_datos import leer_no_vacio
-from lectura_datos import leer_correo
-from clase_productos import consultarProducto1
-
+from lectura_datos import *
+from clase_productos import *
+from clase_ProdAdqu import *
 
 #creacion y conexion con la bas ede datos
 def conexionBD():
@@ -24,23 +20,14 @@ def cerrarDB(con):
     con.close()
     print('conexion cerrada')
 
+def concafecha():
+    dia=input('ingrese el dia en formato DD')
+    mes=input('ingrese el mes en formato MM')
+    año=input('ingrese el año en formato AAAA')
+    fechacon=(dia+'/'+mes+'/'+año)
+    print(fechacon)
+    return fechacon
 
-
-    
-def crearTablaClientes(con):
-    #creamos el objeto para recorrer la base de datos
-    cursor=con.cursor()
-    #ejecutamos la cadena con el metodo execute del objeto cursorObj
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS Clientes(
-                                                noIdCliente INTEGER PRIMARY KEY,
-                                                nombre TEXT NOT NULL,
-                                                apellido TEXT NOT NULL,
-                                                direccion TEXT,
-                                                telefono TEXT,
-                                                correo TEXT) ''')
-    #aseguramos la persistencia con un commit
-    con.commit()
 
 
 def leerProductoContratado1(con):

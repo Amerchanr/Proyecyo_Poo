@@ -49,19 +49,6 @@ def consultarProducto1(con):
         print("el ide del producto es:" ,id1)
         print("el nombre del producto es:" ,nombre)
 
-    
-def crearTablaProductos1(con):
-    #creamos el objeto para recorrer la base de datos
-    cursorObj=con.cursor()
-    #ejecutamos la cadena con el metodo execute del objeto cursorObj
-    cursorObj.execute('''CREATE TABLE IF NOT EXISTS PRODUCTOS (NoIdProducto integer ,
-                                        NombreProducto txt NOT NULL,
-                                        TipoProducto integer NOT NULL,
-                                        Remuneracion integer NOT NULL,
-                                        PRIMARY KEY(NoIdProducto,NombreProducto)) ''')
-    #aseguramos la persistencia con un commit
-    con.commit()
-    
 
     
 def insertarNuevoProducto1(con,miproducto):

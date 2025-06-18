@@ -1,15 +1,8 @@
 import sqlite3
 from sqlite3 import Error
-import lectura_datos
-from lectura_datos import leer_entero
-from lectura_datos import leer_texto
-from lectura_datos import leer_no_vacio
-from lectura_datos import leer_correo
-import clase_cliente
-from clase_cliente import insertarCliente1
-from clase_cliente import leerCliente
-import clase_productos
-from clase_productos import consultarProducto1
+from lectura_datos import *
+from clase_cliente import *
+from clase_productos import *
 
 
 #creacion y conexion con la bas ede datos
@@ -26,27 +19,6 @@ def conexionBD():
 
 def cerrarDB(con):
     con.close()
-
-
-def crearTablaProducAdq(con):
-    #creamos el objeto para recorrer la base de datos
-    cursor=con.cursor()
-    #ejecutamos la cadena con el metodo execute del objeto cursorObj
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS ProductosContratados(
-                                                idCuentaCredito INTEGER PRIMARY KEY AUTOINCREMENT,
-                                                idProducto INTEGER,
-                                                idCliente INTEGER,
-                                                capitalInicial REAL,
-                                                plazoMeses INTEGER,
-                                                fechaEntrega TEXT,
-                                                saldoCapital REAL,
-                                                sumatoriaInteresesPagados REAL DEFAULT 0,
-                                                plazoPendiente INTEGER,
-                                                FOREIGN KEY(idProducto) REFERENCES Productos(noIdProducto),
-                                                FOREIGN KEY(idCliente) REFERENCES Clientes(noIdCliente))  ''')
-    #aseguramos la persistencia con un commit
-    con.commit()
 
 
 def concafecha():
@@ -211,6 +183,13 @@ def BorrarProducto(con):
     #aseguramos la persistencia con un commit
     con.commit()
 
+def concafecha():
+    dia=input('ingrese el dia en formato DD')
+    mes=input('ingrese el mes en formato MM')
+    año=input('ingrese el año en formato AAAA')
+    fechacon=(dia+'/'+mes+'/'+año)
+    print(fechacon)
+    return fechacon
 
             
 #micon=conexionBD()
