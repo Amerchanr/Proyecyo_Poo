@@ -5,6 +5,8 @@ from lectura_datos import leer_entero
 from lectura_datos import leer_texto
 from lectura_datos import leer_no_vacio
 from lectura_datos import leer_correo
+from clase_productos import consultarProducto1
+
 
 #creacion y conexion con la bas ede datos
 def conexionBD():
@@ -20,6 +22,7 @@ def conexionBD():
 
 def cerrarDB(con):
     con.close()
+    print('conexion cerrada')
 
 
 
@@ -40,6 +43,72 @@ def crearTablaClientes(con):
     con.commit()
 
 
+def leerProductoContratado1(con):
+    cursor = con.cursor()
+    print('Las opciones de productos que podemos ofrecer son')
+    consultarProducto1(con)
+    # Leer ID del producto
+    
+    idProducto = leer_entero("Número de producto a contratar: ")
+    
+    cursor.execute("SELECT tipoProducto, remuneracion FROM Productos WHERE noIdProducto=?", (idProducto,))
+    row = cursor.fetchone()
+    if not row:
+        print(" Producto no encontrado.")
+        return
+
+    tipo = int(row[0])
+    interes = float(row[1])
+    tipoTexto = "CRÉDITO" if tipo == 1 else "AHORROS"
+    print(f"Tipo de producto detectado: {tipoTexto}")
+
+    # Leer ID del cliente y verificar existencia
+    idCliente = input("ID del cliente: ")
+    cursor.execute("SELECT * FROM Clientes WHERE noIdCliente=?", (idCliente,))
+    cliente = cursor.fetchone()
+    if not cliente:
+        print(" Cliente no registrado. Debe crear el cliente primero.")
+        return
+
+    # Continuar con el registro según tipo
+    try:
+        if tipo == 1:
+            capital = float(input("Capital inicial: "))
+            plazo = int(input("Plazo en meses: "))
+            fecha = concafecha()
+            saldo = capital
+            plazoPendiente = plazo
+        else:
+            capital=int(0)
+            while capital<100000:
+                
+                print('el monto minimo inicial de ahorro es de 100000')
+                capital = float(input("Monto inicial de ahorro: "))
+            
+            plazo = 0
+            
+            fecha = concafecha()
+            saldo = capital
+            plazoPendiente = 0
+    except ValueError:
+        print(" Error: valores inválidos en capital o plazo.")
+        return
+
+    # Insertar en base de datos y obtener ID generado
+    cursor.execute('''
+        INSERT INTO ProductosContratados
+        (idProducto, idCliente, capitalInicial, plazoMeses, fechaEntrega, saldoCapital, sumatoriaInteresesPagados, plazoPendiente)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (idProducto, idCliente, capital, plazo, fecha, saldo, 0, plazoPendiente))
+    con.commit()
+    idCuenta = cursor.lastrowid
+
+    print(" Producto contratado registrado correctamente.")
+    print(f" Su número de cuenta u obligación es: {idCuenta}")
+
+
+
+
 def insertarCliente1(con, cliente):
     cursor = con.cursor()
     try:
@@ -57,6 +126,7 @@ def insertarCliente(con, cliente):
         cursor.execute("INSERT INTO Clientes VALUES (?, ?, ?, ?, ?, ?)", cliente)
         con.commit()
         print("Cliente creado correctamente. Para continuar debes adquirir un producto")
+        leerProductoContratado1(con)
     #esta ecepcion me permite que si hay un cliente que escriba un id ya existente , no lo permita
     #y el programa no seje de funcionar, en cambio le anuncie al cliente que  el id ya existe
     except sqlite3.IntegrityError:
@@ -75,9 +145,14 @@ def leerCliente():
 
 def actualizarDireccion(con):
     idCliente = input("ID del cliente: ")
+    nuevdirec = leer_no_vacio('Ingrese la nueva dirección: ')
+    
     cursor = con.cursor()
-    cursor.execute("SELECT * FROM Clientes WHERE noIdCliente=?", (idCliente,))
-    cliente = cursor.fetchone()
+    cad = "UPDATE Clientes SET direccion = ? WHERE noIdCliente = ?"
+    cursor.execute(cad, (nuevdirec, idCliente))
+    
+    # Aseguramos la persistencia con un commit
+    con.commit()
     
 
 def consultarInformacionCliente(con):
@@ -130,7 +205,10 @@ def borrar_tabla(con):
     cursorObj.execute(cad)
     print("Tabla borrada exitosamente")
     
-#micon=conexionBD()
+#micon=conexionBD()    
+#cerrarDB(micon)    
+#actualizarDireccion(micon)
 #crearTablaClientes(micon)
-
+#cliente1=leerCliente()
+#insertarCliente(micon,cliente1)
 #borrar_tabla(micon)

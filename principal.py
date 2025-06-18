@@ -5,10 +5,10 @@ from sqlite3 import Error
 import clase_productos
 from clase_productos import menuProductos
 import clase_cliente
-from clase_cliente import insertarCliente
-from clase_cliente import leerCliente
-from clase_cliente import actualizarDireccion
-from clase_cliente import consultarInformacionCliente
+#from clase_cliente import insertarCliente
+#from clase_cliente import leerCliente
+#from clase_cliente import actualizarDireccion
+#from clase_cliente import consultarInformacionCliente
 from clase_cliente import menuClinetes
 from clase_ProdAdqu import menuProductosContratados
 
