@@ -34,6 +34,7 @@ def consultaProducto(con):
         nombre=row[1]
         remuneracion=row[3]
         print("NoIdProducto: ",id1,"\nNombreProducto: ",nombre,"\nTipoProducto: ",tipo,"\nRemuneracion: ",remuneracion)
+
 def consultarProducto1(con):
     #creamos el objeto para recorrer la base de datos
     cursorObj=con.cursor()
@@ -118,9 +119,9 @@ def menuProductos(con):
                             
         opcionProductos=(input('''
                                         Menu Productos
-                                        1)Crear Nuevo Producto
-                                        2)Consuultar Producto
-                                        3)Volver al menu Principal
+                                        1. Crear Nuevo Producto
+                                        2. Consuultar Producto
+                                        3. Volver al menu Principal
                                         Seleccione una opcion >>>>:  '''))
             
         if (opcionProductos=='1'):

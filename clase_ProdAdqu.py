@@ -121,7 +121,7 @@ def leerProductoContratado(con):
 
 
 
-def MenuCrearProducto(con):
+def MenuAdquirirProducto(con):
     salirProductosContratados = False
     while not salirProductosContratados:
         opPrincipal = input('''
@@ -155,7 +155,7 @@ def menuProductosContratados(con):
         opPrincipal = input('''
                             MENU Productos Adquiridos 
 
-                            1. Crear productos 
+                            1. Aquirir un Producto 
                             2. Consultar productos existentes
                             3. Volver a  menú Principal
                             
@@ -164,7 +164,7 @@ def menuProductosContratados(con):
 
                             ''')
         if(opPrincipal == '1'):
-            MenuCrearProducto(con)
+            MenuAdquirirProducto(con)
         elif (opPrincipal == '2'):
             consultarProductosExistentes(con)
 
