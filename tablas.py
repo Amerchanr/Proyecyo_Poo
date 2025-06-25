@@ -3,11 +3,17 @@
 def crearTablas(con):
     cursor = con.cursor()
     # Tabla de productos
-    cursor.execute('''CREATE TABLE IF NOT EXISTS PRODUCTOS (NoIdProducto INTEGER PRIMARY KEY ,
-                                        NombreProducto txt NOT NULL,
-                                        TipoProducto integer NOT NULL,
-                                        Remuneracion integer NOT NULL,
-                                        PRIMARY KEY(NoIdProducto,NombreProducto)) ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS PRODUCTOS (
+            NoIdProducto INTEGER,
+            NombreProducto TEXT NOT NULL,
+            TipoProducto INTEGER NOT NULL,
+            Remuneracion INTEGER NOT NULL,
+            PRIMARY KEY (NoIdProducto, NombreProducto)
+            UNIQUE(NoIdProducto),
+            UNIQUE(NombreProducto)
+        )
+    ''')
     # Tabla de clientes
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS Clientes(

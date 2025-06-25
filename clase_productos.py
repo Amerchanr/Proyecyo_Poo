@@ -28,29 +28,17 @@ def consultaProducto(con):
     #CREAMOS LA CADENA CON EL SQL QUE QUEREMOS EJECUTAR
     cad="SELECT NoIdProducto,NombreProducto,TipoProducto,Remuneracion FROM PRODUCTOS WHERE NoIdProducto="+NoIdProducto
     #ejecutamos la cadena con el metodo execute del objeto cursorObj
-    cursorObj.execute(cad)
-    filas=cursorObj.fetchall()
-    for row in filas:
-        id1=row[0]
-        tipo=row[2]
-        nombre=row[1]
-        remuneracion=row[3]
-        print("NoIdProducto: ",id1,"\nNombreProducto: ",nombre,"\nTipoProducto: ",tipo,"\nRemuneracion: ",remuneracion)
-
-def consultarProducto1(con):
-    #creamos el objeto para recorrer la base de datos
-    cursorObj=con.cursor()
-    #CREAMOS LA CADENA CON EL SQL QUE QUEREMOS EJECUTAR
-    cad="SELECT * FROM PRODUCTOS"
-    #ejecutamos la cadena con el metodo execute del objeto cursorObj
-    cursorObj.execute(cad)
-    filas=cursorObj.fetchall()
-    for row in filas:
-        id1=row[0]
-        tipo=row[2]
-        nombre=row[1]
-        print("el ide del producto es:" ,id1)
-        print("el nombre del producto es:" ,nombre)
+    try:
+        cursorObj.execute(cad)
+        filas=cursorObj.fetchall()
+        for row in filas:
+            id1=row[0]
+            tipo=row[2]
+            nombre=row[1]
+            remuneracion=row[3]
+            print("NoIdProducto: ",id1,"\nNombreProducto: ",nombre,"\nTipoProducto: ",tipo,"\nRemuneracion: ",remuneracion)
+    except sqlite3.OperationalError:
+            print('valor ingresado no encontrado')
 
 
     
@@ -81,19 +69,18 @@ def leerProducto():
             print('El ID del producto debe ser un numero entero')
             
     NombreProducto=str(input("Ingrese el nombre del producto"))
+    while NombreProducto == '':
+        NombreProducto=str(input("Ingrese el nombre del producto"))
+        
 
-    TipoProducto=int(input("tipo producto 1 para credito 2 para Cuenta de Ahorro : "))
+    TipoProducto=None
     
-    if TipoProducto==1:
-        print('ha elegido credito')
-    elif TipoProducto==2:
-        print('ha elegido cuenta de ahorro')
-    while TipoProducto not in [1,2]:
+    while TipoProducto not in ['1', '2'] :
         print('seleccione 1 o 2 dependiendo el tipo de producto')
-        TipoProducto=int(input("tipo producto 1 para credito 2 para Cuenta de Ahorro : "))
-        if TipoProducto==1:
+        TipoProducto=input("tipo producto 1 para credito 2 para Cuenta de Ahorro : ")
+        if TipoProducto=='1':
             print('ha elegido credito')
-        elif TipoProducto==2:
+        elif TipoProducto=='2':
             print('ha elegido cuenta de ahorro')
 
     while True:
@@ -111,6 +98,9 @@ def borrar_tabla(con):
     cad="DROP TABLE IF EXISTS PRODUCTOS"
     cursorObj.execute(cad)
     print("Tabla borrada exitosamente")
+    
+def cerrarBD(con):
+    con.close()
 
     
 def menuProductos(con):
@@ -137,5 +127,10 @@ def menuProductos(con):
         else:
             print('Ingrese una opcion valida')            
     
-
+def main():
+    micon=conexionBD()
+    #consultaProducto(micon)
+    menuProductos(micon)
+    cerrarBD(micon)
+#main()
 
