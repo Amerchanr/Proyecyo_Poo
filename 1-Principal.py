@@ -10,12 +10,7 @@ from tablas import *
 
 
 
-#se crea variable global para ejecutar y poder salir del bucle del menu  principal y menus adicionales  
-Salirprincipal=True
-salirProductos=True
-salirClietes=True
-salirProductosAdq=True
-salirTransacciones=True
+
 
 #creacion y conexion con la bas ede datos
 def conexionBD():
