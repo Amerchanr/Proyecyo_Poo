@@ -39,6 +39,20 @@ def consultaProducto(con):
             print("NoIdProducto: ",id1,"\nNombreProducto: ",nombre,"\nTipoProducto: ",tipo,"\nRemuneracion: ",remuneracion)
     except sqlite3.OperationalError:
             print('valor ingresado no encontrado')
+def consultarProducto1(con):
+    #creamos el objeto para recorrer la base de datos
+    cursorObj=con.cursor()
+    #CREAMOS LA CADENA CON EL SQL QUE QUEREMOS EJECUTAR
+    cad="SELECT * FROM PRODUCTOS"
+    #ejecutamos la cadena con el metodo execute del objeto cursorObj
+    cursorObj.execute(cad)
+    filas=cursorObj.fetchall()
+    for row in filas:
+        id1=row[0]
+        tipo=row[2]
+        nombre=row[1]
+        print("el ide del producto es:" ,id1)
+        print("el nombre del producto es:" ,nombre)
 
 
     
