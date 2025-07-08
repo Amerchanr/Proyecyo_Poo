@@ -15,266 +15,252 @@ def cerrarDB(con):
     con.close()
     print('Conexión cerrada')
 
-# === Crear tabla de Transacciones ===
 
-def crearTablaTransacciones(con):
-    cursor = con.cursor()
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS Transacciones (
-            idTransaccion INTEGER PRIMARY KEY AUTOINCREMENT,
-            idCuentaCredito INTEGER,
-            fechaPago TEXT,
-            valorPagado REAL,
-            FOREIGN KEY (idCuentaCredito) REFERENCES ProductosContratados (idCuentaCredito)
-        )
+class Transacciones:
+    # === Menú ===
+
+    def menuTransacciones(self,con):
+        while True:
+            op = input('''
+    ======= MENU TRANSACCIONES =======
+
+    1. Consultar cuota a pagar
+    2. Pagar cuota
+    3. Consultar saldo proyectado (Ahorros)
+    4. Consignar o retirar (Ahorros)
+    5. Salir
+
+    Seleccione una opción >>>: 
     ''')
-    con.commit()
-    print('Tabla Transacciones lista')
+            if op == '1':
+                consultarCuota(con)
+            elif op == '2':
+                pagarCuota(con)
+            elif op == '3':
+                consultarSaldoAhorros(con)
+            elif op == '4':
+                transaccionAhorros(con)
+            elif op == '5':
+                print("Saliendo del menú de Transacciones...")
+                break
+            else:
+                print("Opción no válida. Intente de nuevo.")
 
-# === Menú ===
+    # === Consultar cuota a pagar ===
 
-def menuTransacciones(con):
-    while True:
-        op = input('''
-======= MENU TRANSACCIONES =======
+    def consultarCuota(self,con):
+        idCuenta = input("Número de cuenta de crédito: ")
+        tipo = obtenerTipoProducto_deCuenta(con, idCuenta)
+        if tipo != 1:
+            print("Error: Solo válido para créditos.")
+            return
 
-1. Consultar cuota a pagar
-2. Pagar cuota
-3. Consultar saldo proyectado (Ahorros)
-4. Consignar o retirar (Ahorros)
-5. Salir
+        datos = obtenerDatosCredito(con, idCuenta)
+        if not datos:
+            print("No se encontró la cuenta de crédito.")
+            return
 
-Seleccione una opción >>>: 
-''')
-        if op == '1':
-            consultarCuota(con)
-        elif op == '2':
-            pagarCuota(con)
-        elif op == '3':
-            consultarSaldoAhorros(con)
-        elif op == '4':
-            transaccionAhorros(con)
-        elif op == '5':
-            print("Saliendo del menú de Transacciones...")
-            break
-        else:
-            print("Opción no válida. Intente de nuevo.")
+        saldo, plazoPendiente, interes = datos
+        if plazoPendiente <= 0:
+            print("El crédito ya está pagado en su totalidad.")
+            return
 
-# === Consultar cuota a pagar ===
+        cuotaCapital = saldo / plazoPendiente
+        cuotaInteres = saldo * (interes / 100)
+        cuotaTotal = cuotaCapital + cuotaInteres
 
-def consultarCuota(con):
-    idCuenta = input("Número de cuenta de crédito: ")
-    tipo = obtenerTipoProducto_deCuenta(con, idCuenta)
-    if tipo != 1:
-        print("Error: Solo válido para créditos.")
-        return
+        print(f'''
+    === CUOTA A PAGAR ===
+    Capital: {cuotaCapital:.2f}
+    Interés: {cuotaInteres:.2f}
+    Total: {cuotaTotal:.2f}
+    Plazo pendiente: {plazoPendiente} meses
+    ======================''')
 
-    datos = obtenerDatosCredito(con, idCuenta)
-    if not datos:
-        print("No se encontró la cuenta de crédito.")
-        return
+    # === Pagar cuota ===
 
-    saldo, plazoPendiente, interes = datos
-    if plazoPendiente <= 0:
-        print("El crédito ya está pagado en su totalidad.")
-        return
+    def pagarCuota(self,con):
+        idCuenta = input("Número de cuenta de crédito: ")
+        tipo = obtenerTipoProducto_deCuenta(con, idCuenta)
+        if tipo != 1:
+            print("Error: Solo válido para créditos.")
+            return
 
-    cuotaCapital = saldo / plazoPendiente
-    cuotaInteres = saldo * (interes / 100)
-    cuotaTotal = cuotaCapital + cuotaInteres
+        datos = obtenerDatosCredito(con, idCuenta)
+        if not datos:
+            print("No se encontró la cuenta de crédito.")
+            return
 
-    print(f'''
-=== CUOTA A PAGAR ===
-Capital: {cuotaCapital:.2f}
-Interés: {cuotaInteres:.2f}
-Total: {cuotaTotal:.2f}
-Plazo pendiente: {plazoPendiente} meses
-======================''')
+        saldo, plazoPendiente, interes = datos
+        if plazoPendiente <= 0:
+            print("El crédito ya está pagado.")
+            return
 
-# === Pagar cuota ===
+        fechaPago = input("Fecha de pago (YYYY-MM-DD): ").strip()
+        mes_actual = fechaPago[:7]
 
-def pagarCuota(con):
-    idCuenta = input("Número de cuenta de crédito: ")
-    tipo = obtenerTipoProducto_deCuenta(con, idCuenta)
-    if tipo != 1:
-        print("Error: Solo válido para créditos.")
-        return
+        cursor = con.cursor()
+        cursor.execute('''
+            SELECT COUNT(*) FROM Transacciones
+            WHERE idCuentaCredito = ? AND substr(fechaPago, 1, 7) = ?
+        ''', (idCuenta, mes_actual))
+        if cursor.fetchone()[0] > 0:
+            print("Ya existe un pago para este mes.")
+            return
 
-    datos = obtenerDatosCredito(con, idCuenta)
-    if not datos:
-        print("No se encontró la cuenta de crédito.")
-        return
+        cuotaCapital = saldo / plazoPendiente
+        cuotaInteres = saldo * (interes / 100)
+        cuotaTotal = cuotaCapital + cuotaInteres
 
-    saldo, plazoPendiente, interes = datos
-    if plazoPendiente <= 0:
-        print("El crédito ya está pagado.")
-        return
+        print(f"Cuota mensual: Capital: {cuotaCapital:.2f}, Interés: {cuotaInteres:.2f}, Total: {cuotaTotal:.2f}")
 
-    fechaPago = input("Fecha de pago (YYYY-MM-DD): ").strip()
-    mes_actual = fechaPago[:7]
+        try:
+            valor = float(input("Valor a pagar: "))
+        except ValueError:
+            print("Error: Valor inválido.")
+            return
 
-    cursor = con.cursor()
-    cursor.execute('''
-        SELECT COUNT(*) FROM Transacciones
-        WHERE idCuentaCredito = ? AND substr(fechaPago, 1, 7) = ?
-    ''', (idCuenta, mes_actual))
-    if cursor.fetchone()[0] > 0:
-        print("Ya existe un pago para este mes.")
-        return
+        saldoNuevo = max(0, saldo - (valor - cuotaInteres))
+        plazoNuevo = max(0, plazoPendiente - 1)
 
-    cuotaCapital = saldo / plazoPendiente
-    cuotaInteres = saldo * (interes / 100)
-    cuotaTotal = cuotaCapital + cuotaInteres
+        interesesAnt = cursor.execute(
+            "SELECT sumatoriaInteresesPagados FROM ProductosContratados WHERE idCuentaCredito = ?",
+            (idCuenta,)
+        ).fetchone()[0] or 0
 
-    print(f"Cuota mensual: Capital: {cuotaCapital:.2f}, Interés: {cuotaInteres:.2f}, Total: {cuotaTotal:.2f}")
+        interesesTotal = interesesAnt + cuotaInteres
 
-    try:
-        valor = float(input("Valor a pagar: "))
-    except ValueError:
-        print("Error: Valor inválido.")
-        return
+        cursor.execute('''
+            INSERT INTO Transacciones (idCuentaCredito, fechaPago, valorPagado)
+            VALUES (?, ?, ?)
+        ''', (idCuenta, fechaPago, valor))
 
-    saldoNuevo = max(0, saldo - (valor - cuotaInteres))
-    plazoNuevo = max(0, plazoPendiente - 1)
+        cursor.execute('''
+            UPDATE ProductosContratados
+            SET saldoCapital = ?, plazoPendiente = ?, sumatoriaInteresesPagados = ?
+            WHERE idCuentaCredito = ?
+        ''', (saldoNuevo, plazoNuevo, interesesTotal, idCuenta))
 
-    interesesAnt = cursor.execute(
-        "SELECT sumatoriaInteresesPagados FROM ProductosContratados WHERE idCuentaCredito = ?",
-        (idCuenta,)
-    ).fetchone()[0] or 0
+        con.commit()
+        imprimirFacturaCredito(idCuenta, valor, cuotaCapital, cuotaInteres, saldoNuevo, plazoNuevo)
 
-    interesesTotal = interesesAnt + cuotaInteres
+    # === Consultar saldo ahorros ===
 
-    cursor.execute('''
-        INSERT INTO Transacciones (idCuentaCredito, fechaPago, valorPagado)
-        VALUES (?, ?, ?)
-    ''', (idCuenta, fechaPago, valor))
+    def consultarSaldoAhorros(self,con):
+        idCuenta = input("Número de cuenta de ahorros: ")
+        tipo = obtenerTipoProducto_deCuenta(con, idCuenta)
+        if tipo != 2:
+            print("Error: Solo válido para cuentas de ahorros.")
+            return
 
-    cursor.execute('''
-        UPDATE ProductosContratados
-        SET saldoCapital = ?, plazoPendiente = ?, sumatoriaInteresesPagados = ?
-        WHERE idCuentaCredito = ?
-    ''', (saldoNuevo, plazoNuevo, interesesTotal, idCuenta))
+        datos = obtenerDatosAhorro(con, idCuenta)
+        if not datos:
+            print("Cuenta no encontrada.")
+            return
 
-    con.commit()
-    imprimirFacturaCredito(idCuenta, valor, cuotaCapital, cuotaInteres, saldoNuevo, plazoNuevo)
+        saldo, interes = datos
+        saldoProyectado = saldo * (1 + interes / 100)
 
-# === Consultar saldo ahorros ===
+        print(f'''
+    === SALDO AHORROS ===
+    Saldo actual: {saldo:.2f}
+    Interés mensual: {interes:.2f}%
+    Saldo proyectado fin de mes: {saldoProyectado:.2f}
+    ======================''')
 
-def consultarSaldoAhorros(con):
-    idCuenta = input("Número de cuenta de ahorros: ")
-    tipo = obtenerTipoProducto_deCuenta(con, idCuenta)
-    if tipo != 2:
-        print("Error: Solo válido para cuentas de ahorros.")
-        return
+    # === Consignar o retirar ahorros ===
 
-    datos = obtenerDatosAhorro(con, idCuenta)
-    if not datos:
-        print("Cuenta no encontrada.")
-        return
+    def transaccionAhorros(self,con):
+        idCuenta = input("Número de cuenta de ahorros: ")
+        tipo = obtenerTipoProducto_deCuenta(con, idCuenta)
+        if tipo != 2:
+            print("Error: Solo válido para cuentas de ahorros.")
+            return
 
-    saldo, interes = datos
-    saldoProyectado = saldo * (1 + interes / 100)
+        datos = obtenerDatosAhorro(con, idCuenta)
+        if not datos:
+            print("Cuenta no encontrada.")
+            return
 
-    print(f'''
-=== SALDO AHORROS ===
-Saldo actual: {saldo:.2f}
-Interés mensual: {interes:.2f}%
-Saldo proyectado fin de mes: {saldoProyectado:.2f}
-======================''')
+        saldo, _ = datos
+        print(f"Saldo actual: {saldo:.2f}")
 
-# === Consignar o retirar ahorros ===
+        fechaPago = input("Fecha de transacción (YYYY-MM-DD): ").strip()
 
-def transaccionAhorros(con):
-    idCuenta = input("Número de cuenta de ahorros: ")
-    tipo = obtenerTipoProducto_deCuenta(con, idCuenta)
-    if tipo != 2:
-        print("Error: Solo válido para cuentas de ahorros.")
-        return
+        try:
+            valor = float(input("Valor a consignar (+) o retirar (-): "))
+        except ValueError:
+            print("Error: Valor inválido.")
+            return
 
-    datos = obtenerDatosAhorro(con, idCuenta)
-    if not datos:
-        print("Cuenta no encontrada.")
-        return
+        saldoNuevo = saldo + valor
 
-    saldo, _ = datos
-    print(f"Saldo actual: {saldo:.2f}")
+        cursor = con.cursor()
+        cursor.execute('''
+            INSERT INTO Transacciones (idCuentaCredito, fechaPago, valorPagado)
+            VALUES (?, ?, ?)
+        ''', (idCuenta, fechaPago, valor))
 
-    fechaPago = input("Fecha de transacción (YYYY-MM-DD): ").strip()
+        cursor.execute('''
+            UPDATE ProductosContratados
+            SET saldoCapital = ?
+            WHERE idCuentaCredito = ?
+        ''', (saldoNuevo, idCuenta))
 
-    try:
-        valor = float(input("Valor a consignar (+) o retirar (-): "))
-    except ValueError:
-        print("Error: Valor inválido.")
-        return
+        con.commit()
+        imprimirFacturaAhorro(idCuenta, valor, saldoNuevo)
 
-    saldoNuevo = saldo + valor
+    # === Utilidades ===
 
-    cursor = con.cursor()
-    cursor.execute('''
-        INSERT INTO Transacciones (idCuentaCredito, fechaPago, valorPagado)
-        VALUES (?, ?, ?)
-    ''', (idCuenta, fechaPago, valor))
+    def obtenerTipoProducto_deCuenta(self,con, idCuenta):
+        cursor = con.cursor()
+        cursor.execute('''
+            SELECT P.tipoProducto
+            FROM ProductosContratados PC
+            JOIN Productos P ON PC.idProducto = P.noIdProducto
+            WHERE PC.idCuentaCredito = ?
+        ''', (idCuenta,))
+        fila = cursor.fetchone()
+        return fila[0] if fila else None
 
-    cursor.execute('''
-        UPDATE ProductosContratados
-        SET saldoCapital = ?
-        WHERE idCuentaCredito = ?
-    ''', (saldoNuevo, idCuenta))
+    def obtenerDatosCredito(self,con, idCuenta):
+        cursor = con.cursor()
+        cursor.execute('''
+            SELECT PC.saldoCapital, PC.plazoPendiente, P.remuneracion
+            FROM ProductosContratados PC
+            JOIN Productos P ON PC.idProducto = P.noIdProducto
+            WHERE PC.idCuentaCredito = ?
+        ''', (idCuenta,))
+        return cursor.fetchone()
 
-    con.commit()
-    imprimirFacturaAhorro(idCuenta, valor, saldoNuevo)
+    def obtenerDatosAhorro(self,con, idCuenta):
+        cursor = con.cursor()
+        cursor.execute('''
+            SELECT PC.saldoCapital, P.remuneracion
+            FROM ProductosContratados PC
+            JOIN Productos P ON PC.idProducto = P.noIdProducto
+            WHERE PC.idCuentaCredito = ?
+        ''', (idCuenta,))
+        return cursor.fetchone()
 
-# === Utilidades ===
+    def imprimirFacturaCredito(idCuenta, valor, cuotaCapital, cuotaInteres, saldoNuevo, plazoNuevo):
+        print(f'''
+    ====== FACTURA DE PAGO CRÉDITO ======
+    Cuenta de crédito: {idCuenta}
+    Valor pagado: {valor:.2f}
+    Cuota capital: {cuotaCapital:.2f}
+    Cuota interés: {cuotaInteres:.2f}
+    Saldo restante: {saldoNuevo:.2f}
+    Plazo pendiente: {plazoNuevo} meses
+    Gracias por su pago.
+    =====================================''')
 
-def obtenerTipoProducto_deCuenta(con, idCuenta):
-    cursor = con.cursor()
-    cursor.execute('''
-        SELECT P.tipoProducto
-        FROM ProductosContratados PC
-        JOIN Productos P ON PC.idProducto = P.noIdProducto
-        WHERE PC.idCuentaCredito = ?
-    ''', (idCuenta,))
-    fila = cursor.fetchone()
-    return fila[0] if fila else None
-
-def obtenerDatosCredito(con, idCuenta):
-    cursor = con.cursor()
-    cursor.execute('''
-        SELECT PC.saldoCapital, PC.plazoPendiente, P.remuneracion
-        FROM ProductosContratados PC
-        JOIN Productos P ON PC.idProducto = P.noIdProducto
-        WHERE PC.idCuentaCredito = ?
-    ''', (idCuenta,))
-    return cursor.fetchone()
-
-def obtenerDatosAhorro(con, idCuenta):
-    cursor = con.cursor()
-    cursor.execute('''
-        SELECT PC.saldoCapital, P.remuneracion
-        FROM ProductosContratados PC
-        JOIN Productos P ON PC.idProducto = P.noIdProducto
-        WHERE PC.idCuentaCredito = ?
-    ''', (idCuenta,))
-    return cursor.fetchone()
-
-def imprimirFacturaCredito(idCuenta, valor, cuotaCapital, cuotaInteres, saldoNuevo, plazoNuevo):
-    print(f'''
-====== FACTURA DE PAGO CRÉDITO ======
-Cuenta de crédito: {idCuenta}
-Valor pagado: {valor:.2f}
-Cuota capital: {cuotaCapital:.2f}
-Cuota interés: {cuotaInteres:.2f}
-Saldo restante: {saldoNuevo:.2f}
-Plazo pendiente: {plazoNuevo} meses
-Gracias por su pago.
-=====================================''')
-
-def imprimirFacturaAhorro(idCuenta, valor, saldoNuevo):
-    print(f'''
-====== FACTURA DE TRANSACCIÓN AHORROS ======
-Cuenta de ahorros: {idCuenta}
-Valor consignado/retirado: {valor:.2f}
-Saldo nuevo: {saldoNuevo:.2f}
-Gracias por su transacción.
-===========================================''')
+    def imprimirFacturaAhorro(self,idCuenta, valor, saldoNuevo):
+        print(f'''
+    ====== FACTURA DE TRANSACCIÓN AHORROS ======
+    Cuenta de ahorros: {idCuenta}
+    Valor consignado/retirado: {valor:.2f}
+    Saldo nuevo: {saldoNuevo:.2f}
+    Gracias por su transacción.
+    ===========================================''')
 
