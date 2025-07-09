@@ -1,6 +1,7 @@
 import sqlite3
 from sqlite3 import Error
 from datetime import datetime
+from abc import ABC, abstractmethod
 
 # ==================== UTILIDADES ====================
 def leer_entero(mensaje):
@@ -289,14 +290,35 @@ class Transacciones:
         c.execute("UPDATE PRODUCTOSCONTRATADOS SET saldoCapital=? WHERE idCuentaCredito=?",(nuevo,idc))
         self.con.commit(); print(f"Nuevo saldo:{nuevo:.2f}")
 
-class AppBanco:
+# ======= CLASE ABSTRACTA PARA EL MENÚ =======
+class BaseMenu(ABC):
+    @abstractmethod
+    def menu(self):
+        pass
+
+
+# ======= APPBANCO HEREDA DE BASEMENU =======
+class AppBanco(BaseMenu):
     def __init__(self, con):
-        self.con = con
+        self._con = con  # atributo privado para usar en getter/setter
         self.prod = Producto(con)
         self.cli = Cliente(con)
         self.pad = ProductoAdquirido(con)
         self.trx = Transacciones(con)
 
+    # === Getter y Setter para conexión ===
+    @property
+    def conexion(self):
+        return self._con
+
+    @conexion.setter
+    def conexion(self, nueva_conexion):
+        if nueva_conexion:
+            self._con = nueva_conexion
+        else:
+            print("Conexión no válida.")
+
+    # === MENÚ PRINCIPAL ===
     def menu(self):
         opciones = {
             '1': self.menu_productos,
@@ -307,41 +329,59 @@ class AppBanco:
         }
         while True:
             print("\n=== MENU PRINCIPAL ===\n1.Productos\n2.Contratar Producto\n3.Clientes\n4.Transacciones\n5.Salir")
-            op=input("Opción: ")
-            acciones=opciones.get(op)
-            if acciones: acciones()
-            else: print("Inválido.")
+            op = input("Opción: ")
+            acciones = opciones.get(op)
+            if acciones:
+                acciones()
+            else:
+                print("Inválido.")
 
     def menu_productos(self):
         while True:
             print("\n-- Productos --\n1.Crear\n2.Consultar\n3.Listar\n4.Volver")
-            op=input("Opción: ")
-            if op=='1': self.prod.insertar()
-            elif op=='2': self.prod.consultar()
-            elif op=='3': self.prod.listar()
-            elif op=='4': break
-            else: print("Inválida.")
+            op = input("Opción: ")
+            if op == '1':
+                self.prod.insertar()
+            elif op == '2':
+                self.prod.consultar()
+            elif op == '3':
+                self.prod.listar()
+            elif op == '4':
+                break
+            else:
+                print("Inválida.")
 
     def menu_clientes(self):
         while True:
             print("\n-- Clientes --\n1.Crear\n2.Actualizar Dirección\n3.Consultar\n4.Volver")
-            op=input("Opción: ")
-            if op=='1': self.cli.insertar()
-            elif op=='2': self.cli.actualizar_direccion()
-            elif op=='3': self.cli.consultar()
-            elif op=='4': break
-            else: print("Inválida.")
+            op = input("Opción: ")
+            if op == '1':
+                self.cli.insertar()
+            elif op == '2':
+                self.cli.actualizar_direccion()
+            elif op == '3':
+                self.cli.consultar()
+            elif op == '4':
+                break
+            else:
+                print("Inválida.")
 
     def menu_transacciones(self):
         while True:
             print("\n-- Transacciones --\n1.Consultar Cuota\n2.Pagar Cuota\n3.Saldo Ahorros\n4.Transacción Ahorros\n5.Volver")
-            op=input("Opción: ")
-            if op=='1': self.trx.consultar_cuota()
-            elif op=='2': self.trx.pagar_cuota()
-            elif op=='3': self.trx.consultar_saldo_ahorros()
-            elif op=='4': self.trx.transaccion_ahorros()
-            elif op=='5': break
-            else: print("Inválida.")
+            op = input("Opción: ")
+            if op == '1':
+                self.trx.consultar_cuota()
+            elif op == '2':
+                self.trx.pagar_cuota()
+            elif op == '3':
+                self.trx.consultar_saldo_ahorros()
+            elif op == '4':
+                self.trx.transaccion_ahorros()
+            elif op == '5':
+                break
+            else:
+                print("Inválida.")
 
 # ==================== EJECUCIÓN PRINCIPAL ====================
 def main():
