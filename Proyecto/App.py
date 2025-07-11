@@ -474,7 +474,11 @@ class Transacciones:
         if not d: print("No existe."); return
         # Se extraen el saldo actual de la cuenta y se almacena en la variable sal
         sal,_=d; print(f"Saldo actual:{sal:.2f}")
+        # Se solicita la fecha de la transacción con la variable fec
+        #y se almacena en la variable fec
         fec=input("Fecha(YYYY-MM-DD): ").strip()[:10]
+        #se pide al usuario el valor a consignar o retirar
+        #y se almacena en la variable val
         val=float(input("Valor(+/-): "))
         nuevo=sal+val
         c=self.con.cursor()
