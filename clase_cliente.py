@@ -22,7 +22,7 @@ def cerrarDB(con):
 
 ## Cliente -----------------------------------------------------------------------------------------------------------------------------------
 
-class Cliente(concafecha,Lectura_datos,Productos,ProductosAdquiridos):
+class Cliente(ProductosAdquiridos):
 
     # Toma el producto cliente y la funcion leerProductoContratado1 para verificar id
 
